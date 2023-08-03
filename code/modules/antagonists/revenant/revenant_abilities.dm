@@ -4,14 +4,14 @@
 		return
 
 	var/list/modifiers = params2list(params)
-	if(LAZYACCESS(modifiers, SHIFT_CLICK))
+	if(modifiers["shift"])
 		ShiftClickOn(A)
 		return
-	if(LAZYACCESS(modifiers, ALT_CLICK))
+	if(modifiers["alt"])
 		AltClickNoInteract(src, A)
 		return
 
-	if(LAZYACCESS(modifiers, CTRL_CLICK))
+	if(modifiers["ctrl"])
 		CtrlClickOn(A)
 		return
 

@@ -909,13 +909,13 @@ GLOBAL_LIST_INIT(blacklisted_builds, list(
 
 /client/Click(atom/object, atom/location, control, params)
 	var/ab = FALSE
-	var/list/modifiers = params2list(params)
+	var/list/L = params2list(params)
 
-	var/dragged = LAZYACCESS(modifiers, DRAG)
-	if(dragged && !LAZYACCESS(modifiers, dragged)) //I don't know what's going on here, but I don't trust it
+	var/dragged = L["drag"]
+	if(dragged && !L[dragged])
 		return
 
-	if (object && object == middragatom && LAZYACCESS(modifiers, LEFT_CLICK))
+	if (object && object == middragatom && L["left"])
 		ab = max(0, 5 SECONDS-(world.time-middragtime)*0.1)
 
 	var/mcl = CONFIG_GET(number/minute_click_limit)

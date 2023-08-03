@@ -79,22 +79,22 @@
 		return
 
 	var/list/modifiers = params2list(params)
-	if(LAZYACCESS(modifiers, SHIFT_CLICK))
-		if(LAZYACCESS(modifiers, MIDDLE_CLICK))
-			ShiftMiddleClickOn(A, params)
-			return
-		if(LAZYACCESS(modifiers, CTRL_CLICK))
-			CtrlShiftClickOn(A)
-			return
-		ShiftClickOn(A)
+	if(modifiers["shift"] && modifiers["middle"])
+		ShiftMiddleClickOn(A, params)
 		return
-	if(LAZYACCESS(modifiers, MIDDLE_CLICK))
+	if(modifiers["shift"] && modifiers["ctrl"])
+		CtrlShiftClickOn(A)
+		return
+	if(modifiers["middle"])
 		MiddleClickOn(A)
 		return
-	if(LAZYACCESS(modifiers, ALT_CLICK)) // alt and alt-gr (rightalt)
+	if(modifiers["shift"])
+		ShiftClickOn(A)
+		return
+	if(modifiers["alt"]) // alt and alt-gr (rightalt)
 		AltClickOn(A)
 		return
-	if(LAZYACCESS(modifiers, CTRL_CLICK))
+	if(modifiers["ctrl"])
 		CtrlClickOn(A)
 		return
 
@@ -106,7 +106,7 @@
 	if(next_move > world.time) // in the year 2000...
 		return
 
-	if(!LAZYACCESS(modifiers, "catcher") && A.IsObscured())
+	if(!modifiers["catcher"] && A.IsObscured())
 		return
 
 	if(ismecha(loc))
@@ -476,8 +476,8 @@
 
 /mob/dead/observer/proc/mouse_wheeled(atom/A, delta_x, delta_y, params)
 	SIGNAL_HANDLER
-	var/list/modifiers = params2list(params)
-	if(LAZYACCESS(modifiers, SHIFT_CLICK))
+	var/list/modifier = params2list(params)
+	if(modifier["shift"])
 		var/view = 0
 		if(delta_y > 0)
 			view = -1

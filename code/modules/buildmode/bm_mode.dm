@@ -73,9 +73,10 @@
 	cornerB = null
 
 /datum/buildmode_mode/proc/handle_click(client/c, params, object)
-	var/list/modifiers = params2list(params)
+	var/list/pa = params2list(params)
+	var/left_click = pa.Find("left")
 	if(use_corner_selection)
-		if(LAZYACCESS(modifiers, LEFT_CLICK))
+		if(left_click)
 			if(!cornerA)
 				cornerA = select_tile(get_turf(object), AREASELECT_CORNERA)
 				return

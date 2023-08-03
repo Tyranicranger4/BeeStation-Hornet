@@ -18,12 +18,12 @@
 	screen_loc = "NORTH,WEST"
 
 /atom/movable/screen/buildmode/mode/Click(location, control, params)
-	var/list/modifiers = params2list(params)
-	if(LAZYACCESS(modifiers, LEFT_CLICK))
+	var/list/pa = params2list(params)
+
+	if(pa.Find("left"))
 		bd.toggle_modeswitch()
-	else if(LAZYACCESS(modifiers, RIGHT_CLICK))
+	else if(pa.Find("right"))
 		bd.mode.change_settings(usr.client)
-		
 	update_icon()
 	return 1
 

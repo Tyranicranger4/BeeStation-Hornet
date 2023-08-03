@@ -1,6 +1,6 @@
 /datum/buildmode_mode/fill
 	key = "fill"
-
+	
 	use_corner_selection = TRUE
 	var/objholder = null
 
@@ -33,10 +33,12 @@
 	..()
 
 /datum/buildmode_mode/fill/handle_selected_area(client/c, params)
-	var/list/modifiers = params2list(params)
+	var/list/pa = params2list(params)
+	var/left_click = pa.Find("left")
+	var/alt_click = pa.Find("alt")
 
-	if(LAZYACCESS(modifiers, LEFT_CLICK)) //rectangular
-		if(LAZYACCESS(modifiers, ALT_CLICK))
+	if(left_click) //rectangular
+		if(alt_click)
 			var/list/deletion_area = block(get_turf(cornerA),get_turf(cornerB))
 			for(var/beep in deletion_area)
 				var/turf/T = beep
