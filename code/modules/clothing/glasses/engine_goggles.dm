@@ -103,8 +103,9 @@
 	if(!port)
 		return
 	var/list/shuttle_areas = port.shuttle_areas
-	for(var/area/region as anything in shuttle_areas)
-		for(var/turf/place as anything in region.get_contained_turfs())
+	for(var/r in shuttle_areas)
+		var/area/region = r
+		for(var/turf/place in region.contents)
 			if(get_dist(user, place) > 7)
 				continue
 			var/image/pic

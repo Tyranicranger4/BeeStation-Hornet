@@ -1,11 +1,4 @@
-/datum/map_template/ruin/proc/try_to_place(z, list/allowed_areas_typecache, turf/forced_turf, clear_below)
-	var/static/list/clear_below_typecache
-	if(!clear_below_typecache)
-		clear_below_typecache = typecacheof(list(
-			/obj/structure/spawner,
-			/mob/living/simple_animal,
-			/obj/structure/flora/ash
-		))
+/datum/map_template/ruin/proc/try_to_place(z,allowed_areas,turf/forced_turf)
 	var/sanity = forced_turf ? 1 : PLACEMENT_TRIES
 	if(SSmapping.level_trait(z,ZTRAIT_ISOLATED_RUINS))
 		return place_on_isolated_level(z)
@@ -15,20 +8,13 @@
 		var/height_border = TRANSITIONEDGE + SPACERUIN_MAP_EDGE_PAD + round(height / 2)
 		var/turf/central_turf = forced_turf ? forced_turf : locate(rand(width_border, world.maxx - width_border), rand(height_border, world.maxy - height_border), z)
 		var/valid = TRUE
+
 		var/list/affected_turfs = get_affected_turfs(central_turf, TRUE)
-		var/list/affected_areas = list()
 
-		for(var/turf/check as anything in affected_turfs)
-			// Use assoc lists to move this out, it's easier that way
-			if(check.flags_1 & NO_RUINS_1)
-				valid = FALSE // set to false before we check
-				break
+		//Check for validity
+		for(var/turf/check as() in affected_turfs)
 			var/area/new_area = get_area(check)
-			affected_areas[new_area] = TRUE
-
-		// This is faster yes. Only BARELY but it is faster
-		for(var/area/affct_area as anything in affected_areas)
-			if(!allowed_areas_typecache[affct_area.type])
+			if(!(istype(new_area, allowed_areas)) || check.flags_1 & NO_RUINS_1)
 				valid = FALSE
 				break
 
@@ -36,15 +22,20 @@
 			continue
 
 		testing("Ruin \"[name]\" placed at ([central_turf.x], [central_turf.y], [central_turf.z])")
-		for(var/turf/T as anything in affected_turfs)
+
+		//Clear out nests and monsters
+		for(var/turf/T as() in affected_turfs)
 			T.flags_1 |= NO_RUINS_1
-			if(clear_below) //Clear out nests and monsters
-				for(var/atom/thing as anything in T)
-					if(clear_below_typecache[thing.type])
-						qdel(thing)
+			for(var/obj/structure/spawner/nest in T)
+				qdel(nest)
+			for(var/mob/living/simple_animal/monster in T)
+				qdel(monster)
+			for(var/obj/structure/flora/ash/plant in T)
+				qdel(plant)
 
 		var/datum/map_generator/map_placer = load(central_turf,centered = TRUE)
 		map_placer.on_completion(CALLBACK(src, PROC_REF(after_ruin_generation), central_turf))
+
 		return map_placer
 
 /datum/map_template/ruin/proc/after_ruin_generation(turf/central_turf)
@@ -65,12 +56,10 @@
 	new /obj/effect/landmark/ruin(center, src)
 	return center
 
-
-/proc/seedRuins(list/z_levels = null, budget = 0, whitelist = list(/area/space), list/potentialRuins, clear_below = FALSE)
+/proc/seedRuins(list/z_levels = null, budget = 0, whitelist = /area/space, list/potentialRuins)
 	if(!z_levels || !z_levels.len)
 		WARNING("No Z levels provided - Not generating ruins")
 		return
-	var/list/whitelist_typecache = typecacheof(whitelist)
 
 	for(var/zl in z_levels)
 		var/turf/T = locate(1, 1, zl)
@@ -133,7 +122,7 @@
 								else
 									break outer
 
-				placed_turf = current_pick.try_to_place(target_z,whitelist_typecache,forced_turf,clear_below)
+				placed_turf = current_pick.try_to_place(target_z,whitelist,forced_turf)
 				if(!placed_turf)
 					continue
 				else
