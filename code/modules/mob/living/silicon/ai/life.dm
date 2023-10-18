@@ -63,7 +63,7 @@
 /mob/living/silicon/ai/updatehealth()
 	if(status_flags & GODMODE)
 		return
-	set_health(maxHealth - getOxyLoss() - getToxLoss() - getBruteLoss() - getFireLoss())
+	health = maxHealth - getOxyLoss() - getToxLoss() - getBruteLoss() - getFireLoss()
 	update_stat()
 	diag_hud_set_health()
 	disconnect_shell()
